@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'users',
     'ScoutbaseAuthentication',
     'corsheaders',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -81,13 +82,14 @@ WSGI_APPLICATION = 'ScoutbaseAuthentication.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'mysql.connector.django',
-        'NAME': 'scoutbase',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': 'rkcrp2c5tw8zqhp0',
+        'USER': 'd1gc0wmclexigoft',
+        'PASSWORD': 'xfxky8ao97o4gely',
+        'HOST': 'o3iyl77734b9n3tg.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
+        'PORT': 3306,
     }
 }
+
 
 
 
