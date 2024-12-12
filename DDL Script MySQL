@@ -1,0 +1,74 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- Schema scoutbase
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema scoutbase
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `scoutbase` DEFAULT CHARACTER SET utf8 ;
+USE `scoutbase` ;
+
+-- -----------------------------------------------------
+-- Table `scoutbase`.`athletes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `scoutbase`.`athletes` (
+  `athlete_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `height` VARCHAR(45) NOT NULL,
+  `weight` VARCHAR(45) NOT NULL,
+  `high_school` VARCHAR(45) NOT NULL,
+  `positions` VARCHAR(45) NOT NULL,
+  `media_url` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`athlete_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `scoutbase`.`coaches`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `scoutbase`.`coaches` (
+  `coach_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `team_needs` VARCHAR(45) NOT NULL,
+  `school_name` VARCHAR(45) NOT NULL,
+  `position_within_org` VARCHAR(45) NOT NULL,
+  `bio` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`coach_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `scoutbase`.`scouts`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `scoutbase`.`scouts` (
+  `scout_id` INT(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`scout_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `scoutbase`.`users`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `scoutbase`.`users` (
+  `user_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `email` VARCHAR(45) NOT NULL,
+  `password` VARCHAR(45) NOT NULL,
+  `role` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`user_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
