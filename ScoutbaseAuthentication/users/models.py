@@ -1,28 +1,43 @@
-# Import the models module from the django.db package
-# Import the AbstractUser, Group, and Permission classes from the django.contrib.auth.models module
+# models.py
 from django.db import models
-from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.contrib.auth.models import AbstractUser, Group, Permission, BaseUserManager
 
-# The custom user model has the following fields:
+# Custom UserManager to handle user creation without username
+class UserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        """
+        Create and return a user with an email and password.
+        """
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
-# - name: A CharField with a maximum length of 255 characters
-# - email: A CharField with a maximum length of 255 characters and unique constraint
-# - password: A CharField with a maximum length of 255 characters
-# - username: None (to disable the default username field)
-# - groups: A ManyToManyField relationship with the Group model
+    def create_superuser(self, email, password=None, **extra_fields):
+        """
+        Create and return a superuser with an email and password.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, password, **extra_fields)
 
-# Create a custom user model that extends the AbstractUser class
+
+# Custom User model
 class User(AbstractUser):
+    # Custom fields
     name = models.CharField(max_length=255)
-    email = models.CharField(max_length=255, unique=True)
+    email = models.EmailField(max_length=255, unique=True)  # EmailField instead of CharField for validation
     password = models.CharField(max_length=255)
-    username = None
+    username = None  # Disables default username field
 
+    # Specify that the email field is used for authentication
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = []  # Removes username requirement
 
-# - groups function will later be used to assign the user to a role (Coach, Player, etc)
-
+    # Many-to-many relationships with Group and Permission
     groups = models.ManyToManyField(
         Group,
         related_name="custom_user_groups",
@@ -30,9 +45,6 @@ class User(AbstractUser):
         help_text="The groups this user belongs to.",
         verbose_name="groups",
     )
-
-# - user_permissions: A ManyToManyField relationship with the Permission model
-
     user_permissions = models.ManyToManyField(
         Permission,
         related_name="custom_user_permissions",
@@ -40,3 +52,40 @@ class User(AbstractUser):
         help_text="Specific permissions for this user.",
         verbose_name="user permissions",
     )
+
+    # Relationship with the Role model
+    role = models.ForeignKey(
+        "Role",
+        on_delete=models.SET_NULL,  # If role is deleted, set role to null
+        null=True,
+        blank=True,
+        related_name="users",
+        help_text="The role assigned to this user.",
+    )
+
+    objects = UserManager()  # Set the custom manager here
+
+    def __str__(self):
+        return self.email
+
+
+# Role model to define different roles like Coach, Player, or Scout
+class Role(models.Model):
+    # Role name
+    name = models.CharField(
+        max_length=255,
+        unique=True,
+        help_text="Name of the role, e.g., Coach, Player, or Scout.",
+    )
+
+    # Permissions associated with the role
+    permissions = models.ManyToManyField(
+        Permission,
+        related_name="role_permissions",
+        blank=True,
+        help_text="Specific permissions for this role.",
+        verbose_name="role permissions",
+    )
+
+    def __str__(self):
+        return self.name

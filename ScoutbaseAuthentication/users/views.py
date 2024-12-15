@@ -104,3 +104,31 @@ class LogoutView(APIView):
             'message': 'success'
         }
         return response
+    
+    # Import the Role model
+from .models import Role
+
+# Add a new APIView for assigning roles
+class AssignRoleView(APIView):
+    def post(self, request):
+        user_id = request.data.get('user_id')
+        role_name = request.data.get('role_name')
+
+        if not user_id or not role_name:
+            return Response({"error": "user_id and role_name are required"}, status=400)
+
+        # Fetch the user by ID
+        user = User.objects.filter(id=user_id).first()
+        if not user:
+            return Response({"error": "User not found"}, status=404)
+
+        # Fetch the role by name
+        role = Role.objects.filter(name=role_name).first()
+        if not role:
+            return Response({"error": f"Role '{role_name}' does not exist"}, status=404)
+
+        # Assign the role to the user
+        user.role = role
+        user.save()
+
+        return Response({"message": f"Role '{role_name}' assigned to user '{user.email}'"}, status=200)
