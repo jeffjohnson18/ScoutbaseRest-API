@@ -23,6 +23,16 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
+    
+    def get_user_role(self, user_id):
+            """
+            Fetch and return the role name of a user by their ID.
+            """
+            try:
+                user = self.get(pk=user_id)
+                return user.role.name if user.role else None
+            except User.DoesNotExist:
+                return None
 
 
 # Custom User model
@@ -89,3 +99,4 @@ class Role(models.Model):
 
     def __str__(self):
         return self.name
+

@@ -132,3 +132,27 @@ class AssignRoleView(APIView):
         user.save()
 
         return Response({"message": f"Role '{role_name}' assigned to user '{user.email}'"}, status=200)
+    
+class FetchUserRoleView(APIView):
+    def get(self, request):
+        # Extract and validate 'user_id' from query parameters
+        user_id = request.query_params.get('user_id')
+        if not user_id:
+            return Response({"error": "user_id is required"}, status=400)
+
+        try:
+            user_id = int(user_id)  # Ensure user_id is a valid integer
+        except ValueError:
+            return Response({"error": "user_id must be a number"}, status=400)
+
+        # Fetch the user using the validated user_id
+        user = User.objects.filter(id=user_id).first()
+        if not user:
+            return Response({"error": "User not found"}, status=404)
+
+        # Fetch the user's role
+        if not user.role:
+            return Response({"role": None, "message": "User has no role assigned"}, status=200)
+
+        # Return the role information
+        return Response({"role": user.role.name}, status=200)
