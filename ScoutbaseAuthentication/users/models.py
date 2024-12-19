@@ -100,3 +100,33 @@ class Role(models.Model):
     def __str__(self):
         return self.name
 
+# models.py
+class AthleteProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="athlete_profile")
+    high_school_name = models.CharField(max_length=255)
+    positions = models.CharField(max_length=255)
+    youtube_video_link = models.URLField(max_length=255, blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='athletes/', blank=True, null=True)
+    height = models.FloatField()
+    weight = models.FloatField()
+    bio = models.TextField()
+
+    def __str__(self):
+        return self.user.email
+
+class CoachProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="coach_profile")
+    team_needs = models.CharField(max_length=255)
+    school_name = models.CharField(max_length=255)
+    position = models.CharField(max_length=255)
+    bio = models.TextField()
+    profile_picture = models.ImageField(upload_to='coaches/', blank=True, null=True)
+
+    def __str__(self):
+        return self.user.email
+
+class ScoutProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="scout_profile")
+    # Add any specific fields for Scout profile here
+    def __str__(self):
+        return self.user.email

@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import User, Role
+from .models import User, Role, AthleteProfile, CoachProfile, ScoutProfile
+
 
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -41,3 +42,22 @@ class UserSerializer(serializers.ModelSerializer):
             instance.save()
 
         return instance
+
+# serializers.py
+from rest_framework import serializers
+from .models import AthleteProfile, CoachProfile, ScoutProfile
+
+class AthleteProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AthleteProfile
+        fields = ['high_school_name', 'positions', 'youtube_video_link', 'profile_picture', 'height', 'weight', 'bio']
+
+class CoachProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CoachProfile
+        fields = ['team_needs', 'school_name', 'position', 'bio', 'profile_picture']
+
+class ScoutProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScoutProfile
+        fields = []  # Add specific fields for Scout profile as needed

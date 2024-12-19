@@ -8,7 +8,7 @@
 import jwt
 import datetime
 from rest_framework.views import APIView
-from .serializers import UserSerializer
+from .serializers import UserSerializer, AthleteProfileSerializer, CoachProfileSerializer, ScoutProfileSerializer
 from rest_framework.response import Response
 from .models import User
 from rest_framework.exceptions import AuthenticationFailed
@@ -156,3 +156,73 @@ class FetchUserRoleView(APIView):
 
         # Return the role information
         return Response({"role": user.role.name}, status=200)
+
+# views.py
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .models import User, CoachProfile
+from .serializers import CoachProfileSerializer
+from rest_framework.exceptions import ValidationError
+
+class CreateCoachView(APIView):
+    def post(self, request):
+        user_id = request.data.get('user_id')
+
+        # Fetch the user by ID
+        user = User.objects.filter(id=user_id).first()
+        if not user:
+            return Response({"error": "User not found"}, status=404)
+
+        # Check if the user already has a coach profile
+        if hasattr(user, 'coach_profile'):
+            raise ValidationError("Coach profile already exists for this user.")
+
+        # Serialize the coach profile data
+        serializer = CoachProfileSerializer(data=request.data)
+        if serializer.is_valid():
+            # Create the coach profile and associate it with the user
+            coach_profile = serializer.save(user=user)
+            return Response(CoachProfileSerializer(coach_profile).data, status=201)
+        return Response(serializer.errors, status=400)
+
+class CreateAthleteView(APIView):
+    def post(self, request):
+        user_id = request.data.get('user_id')
+
+        # Fetch the user by ID
+        user = User.objects.filter(id=user_id).first()
+        if not user:
+            return Response({"error": "User not found"}, status=404)
+
+        # Check if the user already has an athlete profile
+        if hasattr(user, 'athlete_profile'):
+            raise ValidationError("Athlete profile already exists for this user.")
+
+        # Serialize the athlete profile data
+        serializer = AthleteProfileSerializer(data=request.data)
+        if serializer.is_valid():
+            # Create the athlete profile and associate it with the user
+            athlete_profile = serializer.save(user=user)
+            return Response(AthleteProfileSerializer(athlete_profile).data, status=201)
+        return Response(serializer.errors, status=400)
+
+class CreateScoutView(APIView):
+    def post(self, request):
+        user_id = request.data.get('user_id')
+
+        # Fetch the user by ID
+        user = User.objects.filter(id=user_id).first()
+        if not user:
+            return Response({"error": "User not found"}, status=404)
+
+        # Check if the user already has a scout profile
+        if hasattr(user, 'scout_profile'):
+            raise ValidationError("Scout profile already exists for this user.")
+
+        # Serialize the scout profile data
+        serializer = ScoutProfileSerializer(data=request.data)
+        if serializer.is_valid():
+            # Create the scout profile and associate it with the user
+            scout_profile = serializer.save(user=user)
+            return Response(ScoutProfileSerializer(scout_profile).data, status=201)
+        return Response(serializer.errors, status=400)
