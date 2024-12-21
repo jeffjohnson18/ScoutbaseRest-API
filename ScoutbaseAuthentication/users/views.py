@@ -8,10 +8,12 @@
 import jwt
 import datetime
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from .serializers import UserSerializer, AthleteProfileSerializer, CoachProfileSerializer, ScoutProfileSerializer
 from rest_framework.response import Response
-from .models import User
+from .models import User, AthleteProfile, CoachProfile, ScoutProfile
 from rest_framework.exceptions import AuthenticationFailed
+from django.db.models import Q
 
 # Create a RegisterView class that extends the APIView class
 # The RegisterView class is used to register a new user
@@ -226,3 +228,40 @@ class CreateScoutView(APIView):
             scout_profile = serializer.save(user=user)
             return Response(ScoutProfileSerializer(scout_profile).data, status=201)
         return Response(serializer.errors, status=400)
+
+class SearchAthleteView(ListAPIView):
+    serializer_class = AthleteProfileSerializer
+
+    def get_queryset(self):
+        queryset = AthleteProfile.objects.all()
+        name = self.request.query_params.get('name', None)
+        position = self.request.query_params.get('position', None)
+        high_school = self.request.query_params.get('high_school', None)
+
+        if name:
+            queryset = queryset.filter(Q(user__first_name__icontains=name) | Q(user__last_name__icontains=name))
+        if position:
+            queryset = queryset.filter(positions__icontains=position)
+        if high_school:
+            queryset = queryset.filter(high_school_name__icontains=high_school)
+
+        return queryset
+
+
+class SearchCoachView(ListAPIView):
+    serializer_class = CoachProfileSerializer
+
+    def get_queryset(self):
+        queryset = CoachProfile.objects.all()
+        name = self.request.query_params.get('name', None)
+        team_needs = self.request.query_params.get('team_needs', None)
+        school_name = self.request.query_params.get('school_name', None)
+
+        if name:
+            queryset = queryset.filter(Q(user__first_name__icontains=name) | Q(user__last_name__icontains=name))
+        if team_needs:
+            queryset = queryset.filter(team_needs__icontains=team_needs)
+        if school_name:
+            queryset = queryset.filter(school_name__icontains=school_name)
+
+        return queryset
