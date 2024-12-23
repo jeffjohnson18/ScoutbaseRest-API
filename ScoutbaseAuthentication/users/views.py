@@ -14,6 +14,9 @@ from rest_framework.response import Response
 from .models import User, AthleteProfile, CoachProfile, ScoutProfile
 from rest_framework.exceptions import AuthenticationFailed
 from django.db.models import Q
+from rest_framework.exceptions import ValidationError
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
+
 
 # Create a RegisterView class that extends the APIView class
 # The RegisterView class is used to register a new user
@@ -265,3 +268,32 @@ class SearchCoachView(ListAPIView):
             queryset = queryset.filter(school_name__icontains=school_name)
 
         return queryset
+    
+
+class EditCoachView(APIView):
+    def put(self, request, pk):
+        # Fetch the coach profile by primary key (pk)
+        coach_profile = CoachProfile.objects.filter(pk=pk).first()
+        if not coach_profile:
+            return Response({"error": "Coach profile not found"}, status=HTTP_404_NOT_FOUND)
+
+        # Update the coach profile with the provided data
+        serializer = CoachProfileSerializer(coach_profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=HTTP_200_OK)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+class EditAthleteView(APIView):
+    def put(self, request, pk):
+        # Fetch the athlete profile by primary key (pk)
+        athlete_profile = AthleteProfile.objects.filter(pk=pk).first()
+        if not athlete_profile:
+            return Response({"error": "Athlete profile not found"}, status=HTTP_404_NOT_FOUND)
+
+        # Update the athlete profile with the provided data
+        serializer = AthleteProfileSerializer(athlete_profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=HTTP_200_OK)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
