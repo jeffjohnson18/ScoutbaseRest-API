@@ -46,7 +46,7 @@ class AthleteProfileSerializer(serializers.ModelSerializer):
 class CoachProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CoachProfile
-        fields = ['team_needs', 'school_name', 'position', 'bio', 'profile_picture', 'state']
+        fields = ['team_needs', 'school_name','bio', 'profile_picture', 'state']
 
 # ScoutProfile Serializer
 class ScoutProfileSerializer(serializers.ModelSerializer):
