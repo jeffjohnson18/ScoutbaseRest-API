@@ -173,19 +173,15 @@ class CreateCoachView(APIView):
     def post(self, request):
         user_id = request.data.get('user_id')
 
-        # Fetch the user by ID
         user = User.objects.filter(id=user_id).first()
         if not user:
             return Response({"error": "User not found"}, status=404)
 
-        # Check if the user already has a coach profile
         if hasattr(user, 'coach_profile'):
             raise ValidationError("Coach profile already exists for this user.")
 
-        # Serialize the coach profile data
         serializer = CoachProfileSerializer(data=request.data)
         if serializer.is_valid():
-            # Create the coach profile and associate it with the user
             coach_profile = serializer.save(user=user)
             return Response(CoachProfileSerializer(coach_profile).data, status=201)
         return Response(serializer.errors, status=400)
@@ -194,22 +190,19 @@ class CreateAthleteView(APIView):
     def post(self, request):
         user_id = request.data.get('user_id')
 
-        # Fetch the user by ID
         user = User.objects.filter(id=user_id).first()
         if not user:
             return Response({"error": "User not found"}, status=404)
 
-        # Check if the user already has an athlete profile
         if hasattr(user, 'athlete_profile'):
             raise ValidationError("Athlete profile already exists for this user.")
 
-        # Serialize the athlete profile data
         serializer = AthleteProfileSerializer(data=request.data)
         if serializer.is_valid():
-            # Create the athlete profile and associate it with the user
             athlete_profile = serializer.save(user=user)
             return Response(AthleteProfileSerializer(athlete_profile).data, status=201)
         return Response(serializer.errors, status=400)
+
 
 class CreateScoutView(APIView):
     def post(self, request):
@@ -237,16 +230,10 @@ class SearchAthleteView(ListAPIView):
 
     def get_queryset(self):
         queryset = AthleteProfile.objects.all()
-        name = self.request.query_params.get('name', None)
-        position = self.request.query_params.get('position', None)
-        high_school = self.request.query_params.get('high_school', None)
+        state = self.request.query_params.get('state', None)
 
-        if name:
-            queryset = queryset.filter(Q(user__first_name__icontains=name) | Q(user__last_name__icontains=name))
-        if position:
-            queryset = queryset.filter(positions__icontains=position)
-        if high_school:
-            queryset = queryset.filter(high_school_name__icontains=high_school)
+        if state:
+            queryset = queryset.filter(state__icontains=state)
 
         return queryset
 
@@ -256,28 +243,21 @@ class SearchCoachView(ListAPIView):
 
     def get_queryset(self):
         queryset = CoachProfile.objects.all()
-        name = self.request.query_params.get('name', None)
-        team_needs = self.request.query_params.get('team_needs', None)
-        school_name = self.request.query_params.get('school_name', None)
+        state = self.request.query_params.get('state', None)
 
-        if name:
-            queryset = queryset.filter(Q(user__first_name__icontains=name) | Q(user__last_name__icontains=name))
-        if team_needs:
-            queryset = queryset.filter(team_needs__icontains=team_needs)
-        if school_name:
-            queryset = queryset.filter(school_name__icontains=school_name)
+        if state:
+            queryset = queryset.filter(state__icontains=state)
 
         return queryset
+
     
 
 class EditCoachView(APIView):
     def put(self, request, pk):
-        # Fetch the coach profile by primary key (pk)
         coach_profile = CoachProfile.objects.filter(pk=pk).first()
         if not coach_profile:
             return Response({"error": "Coach profile not found"}, status=HTTP_404_NOT_FOUND)
 
-        # Update the coach profile with the provided data
         serializer = CoachProfileSerializer(coach_profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -286,12 +266,10 @@ class EditCoachView(APIView):
 
 class EditAthleteView(APIView):
     def put(self, request, pk):
-        # Fetch the athlete profile by primary key (pk)
         athlete_profile = AthleteProfile.objects.filter(pk=pk).first()
         if not athlete_profile:
             return Response({"error": "Athlete profile not found"}, status=HTTP_404_NOT_FOUND)
 
-        # Update the athlete profile with the provided data
         serializer = AthleteProfileSerializer(athlete_profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
