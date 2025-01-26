@@ -16,6 +16,11 @@ from rest_framework.exceptions import AuthenticationFailed
 from django.db.models import Q
 from rest_framework.exceptions import ValidationError
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .models import User, CoachProfile
+from .serializers import CoachProfileSerializer
+from rest_framework.exceptions import ValidationError
 
 
 # Create a RegisterView class that extends the APIView class
@@ -162,12 +167,6 @@ class FetchUserRoleView(APIView):
         # Return the role information
         return Response({"role": user.role.name}, status=200)
 
-# views.py
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from .models import User, CoachProfile
-from .serializers import CoachProfileSerializer
-from rest_framework.exceptions import ValidationError
 
 class CreateCoachView(APIView):
     def post(self, request):
@@ -230,10 +229,25 @@ class SearchAthleteView(ListAPIView):
 
     def get_queryset(self):
         queryset = AthleteProfile.objects.all()
+        
+        # Get query parameters
+        high_school_name = self.request.query_params.get('high_school_name', None)
+        positions = self.request.query_params.get('positions', None)
         state = self.request.query_params.get('state', None)
+        height = self.request.query_params.get('height', None)
+        weight = self.request.query_params.get('weight', None)
 
+        # Apply filters if parameters are provided
+        if high_school_name:
+            queryset = queryset.filter(high_school_name__icontains=high_school_name)
+        if positions:
+            queryset = queryset.filter(positions__icontains=positions)
         if state:
             queryset = queryset.filter(state__icontains=state)
+        if height:
+            queryset = queryset.filter(height=height)
+        if weight:
+            queryset = queryset.filter(weight=weight) 
 
         return queryset
 
@@ -243,12 +257,22 @@ class SearchCoachView(ListAPIView):
 
     def get_queryset(self):
         queryset = CoachProfile.objects.all()
+        
+        # Get query parameters
+        team_needs = self.request.query_params.get('team_needs', None)
+        school_name = self.request.query_params.get('school_name', None)
         state = self.request.query_params.get('state', None)
 
+        # Apply filters if parameters are provided
+        if team_needs:
+            queryset = queryset.filter(team_needs__icontains=team_needs)
+        if school_name:
+            queryset = queryset.filter(school_name__icontains=school_name)
         if state:
             queryset = queryset.filter(state__icontains=state)
 
         return queryset
+
 
     
 
