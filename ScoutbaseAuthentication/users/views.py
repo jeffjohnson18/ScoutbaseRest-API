@@ -231,6 +231,7 @@ class SearchAthleteView(ListAPIView):
         queryset = AthleteProfile.objects.all()
         
         # Get query parameters
+        user_id = self.request.query_params.get('user_id', None)
         high_school_name = self.request.query_params.get('high_school_name', None)
         positions = self.request.query_params.get('positions', None)
         state = self.request.query_params.get('state', None)
@@ -248,7 +249,9 @@ class SearchAthleteView(ListAPIView):
             queryset = queryset.filter(height=height)
         if weight:
             queryset = queryset.filter(weight=weight) 
-
+        if user_id:
+            queryset = queryset.filter(user_id=user_id)
+            
         return queryset
 
 
@@ -259,6 +262,7 @@ class SearchCoachView(ListAPIView):
         queryset = CoachProfile.objects.all()
         
         # Get query parameters
+        user_id = self.request.query_params.get('user_id', None)
         team_needs = self.request.query_params.get('team_needs', None)
         school_name = self.request.query_params.get('school_name', None)
         state = self.request.query_params.get('state', None)
@@ -270,6 +274,8 @@ class SearchCoachView(ListAPIView):
             queryset = queryset.filter(school_name__icontains=school_name)
         if state:
             queryset = queryset.filter(state__icontains=state)
+        if user_id:
+            queryset = queryset.filter(user_id=user_id) 
 
         return queryset
 
