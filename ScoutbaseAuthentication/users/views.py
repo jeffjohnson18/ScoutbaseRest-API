@@ -16,11 +16,9 @@ from rest_framework.exceptions import AuthenticationFailed
 from django.db.models import Q
 from rest_framework.exceptions import ValidationError
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import User, CoachProfile
 from .serializers import CoachProfileSerializer
-from rest_framework.exceptions import ValidationError
 
 
 # Create a RegisterView class that extends the APIView class
