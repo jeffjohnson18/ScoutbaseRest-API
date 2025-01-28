@@ -282,8 +282,9 @@ class SearchCoachView(ListAPIView):
 
 class EditCoachView(APIView):
     def put(self, request, pk):
-        coach_profile = CoachProfile.objects.filter(pk=pk).first()
-        if not coach_profile:
+        try:
+            coach_profile = CoachProfile.objects.get(user_id=pk)  # <-- Change to user_id
+        except CoachProfile.DoesNotExist:
             return Response({"error": "Coach profile not found"}, status=HTTP_404_NOT_FOUND)
 
         serializer = CoachProfileSerializer(coach_profile, data=request.data, partial=True)
@@ -292,10 +293,12 @@ class EditCoachView(APIView):
             return Response(serializer.data, status=HTTP_200_OK)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
+
 class EditAthleteView(APIView):
     def put(self, request, pk):
-        athlete_profile = AthleteProfile.objects.filter(pk=pk).first()
-        if not athlete_profile:
+        try:
+            athlete_profile = AthleteProfile.objects.get(user_id=pk)  # <-- Change this line
+        except AthleteProfile.DoesNotExist:
             return Response({"error": "Athlete profile not found"}, status=HTTP_404_NOT_FOUND)
 
         serializer = AthleteProfileSerializer(athlete_profile, data=request.data, partial=True)
