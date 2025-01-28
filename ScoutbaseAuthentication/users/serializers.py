@@ -33,17 +33,20 @@ class UserSerializer(serializers.ModelSerializer):
 
 # AthleteProfile Serializer
 class AthleteProfileSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.ImageField(required=False, allow_null=True, allow_empty_file=True)
     class Meta:
         model = AthleteProfile
         fields = ['high_school_name', 'positions', 'youtube_video_link', 'profile_picture', 'height', 'weight', 'bio', 'state']
 
     def validate_youtube_video_link(self, value):
+        
         if value and not value.startswith('https://www.youtube.com/'):
             raise serializers.ValidationError("Invalid YouTube URL")
         return value
 
 # CoachProfile Serializer
 class CoachProfileSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.ImageField(required=False, allow_null=True, allow_empty_file=True)
     class Meta:
         model = CoachProfile
         fields = ['team_needs', 'school_name','bio', 'profile_picture', 'state']

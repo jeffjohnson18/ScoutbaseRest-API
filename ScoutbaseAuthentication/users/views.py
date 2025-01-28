@@ -177,11 +177,16 @@ class CreateCoachView(APIView):
         if hasattr(user, 'coach_profile'):
             raise ValidationError("Coach profile already exists for this user.")
 
+        # Check if 'profile_picture' is provided
+        profile_picture = request.data.get('profile_picture', None)
+
+        # Handle the profile_picture (image file) in the request
         serializer = CoachProfileSerializer(data=request.data)
         if serializer.is_valid():
             coach_profile = serializer.save(user=user)
             return Response(CoachProfileSerializer(coach_profile).data, status=201)
         return Response(serializer.errors, status=400)
+
 
 class CreateAthleteView(APIView):
     def post(self, request):
@@ -193,12 +198,18 @@ class CreateAthleteView(APIView):
 
         if hasattr(user, 'athlete_profile'):
             raise ValidationError("Athlete profile already exists for this user.")
+        
+        # Check if 'profile_picture' is provided
+        profile_picture = request.data.get('profile_picture', None)
+        
 
+        # Handle the profile_picture (image file) in the request
         serializer = AthleteProfileSerializer(data=request.data)
         if serializer.is_valid():
             athlete_profile = serializer.save(user=user)
             return Response(AthleteProfileSerializer(athlete_profile).data, status=201)
         return Response(serializer.errors, status=400)
+
 
 
 class CreateScoutView(APIView):
