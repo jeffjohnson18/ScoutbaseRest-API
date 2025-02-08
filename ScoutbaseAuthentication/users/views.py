@@ -19,6 +19,7 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NO
 from rest_framework.response import Response
 from .models import User, CoachProfile
 from .serializers import CoachProfileSerializer
+from rest_framework.permissions import IsAuthenticated
 
 
 # Create a RegisterView class that extends the APIView class
@@ -317,3 +318,33 @@ class EditAthleteView(APIView):
             serializer.save()
             return Response(serializer.data, status=HTTP_200_OK)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+class DeleteAccountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated')
+
+        user = User.objects.filter(id=payload['id']).first()
+        if not user:
+            return Response({"error": "User not found"}, status=HTTP_404_NOT_FOUND)
+
+        # Delete related profiles if they exist
+        AthleteProfile.objects.filter(user=user).delete()
+        CoachProfile.objects.filter(user=user).delete()
+        ScoutProfile.objects.filter(user=user).delete()
+
+        # Delete the user account
+        user.delete()
+
+        response = Response({"message": "Account deleted successfully"}, status=HTTP_200_OK)
+        response.delete_cookie('jwt')  # Remove the authentication token
+        return response
