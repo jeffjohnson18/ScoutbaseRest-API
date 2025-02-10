@@ -302,7 +302,9 @@ class SearchAthleteView(ListAPIView):
             'positions__icontains': self.request.query_params.get('positions'),
             'state__icontains': self.request.query_params.get('state'),
             'height': self.request.query_params.get('height'),
-            'weight': self.request.query_params.get('weight')
+            'weight': self.request.query_params.get('weight'),
+            'batting_arm': self.request.query_params.get('batting_arm'),
+            'throwing_arm': self.request.query_params.get('throwing_arm')
         }
         
         # Apply non-null filters

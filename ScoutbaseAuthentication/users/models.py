@@ -202,6 +202,17 @@ class AthleteProfile(models.Model):
         default="Unknown",
         help_text="State of residence/school"
     )
+    throwing_arm = models.CharField(
+        max_length=255,
+        default="Unknown",
+        help_text="State of residence/school"
+    )
+    batting_arm = models.CharField(
+        max_length=255,
+        default="Unknown",
+        help_text="State of residence/school"
+    )
+
 
 class CoachProfile(models.Model):
     """

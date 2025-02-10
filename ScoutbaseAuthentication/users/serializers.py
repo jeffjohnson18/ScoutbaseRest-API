@@ -124,7 +124,9 @@ class AthleteProfileSerializer(serializers.ModelSerializer):
             'height',
             'weight',
             'bio',
-            'state'
+            'state',
+            'batting_arm',
+            'throwing_arm'
         ]
 
     def validate_youtube_video_link(self, value):
