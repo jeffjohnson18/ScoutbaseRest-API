@@ -13,15 +13,18 @@
 # Standard library imports
 import jwt
 import datetime
+import logging
 
 # Django and DRF imports
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
+from django.core.mail import send_mail
+from django.conf import settings
 
 # Local application imports
 from .serializers import (
@@ -37,6 +40,8 @@ from .models import (
     ScoutProfile,
     Role
 )
+
+logger = logging.getLogger(__name__)
 
 class RegisterView(APIView):
     """
@@ -424,3 +429,71 @@ class DeleteAccountView(APIView):
         response = Response({"message": "Account deleted successfully"}, status=HTTP_200_OK)
         response.delete_cookie('jwt')
         return response
+
+class SendEmailView(APIView):
+    """
+    Sends an email to a specified user.
+    
+    Endpoints:
+        POST /send-email/: Sends email to specified user
+    
+    Request Body:
+        - recipient_id: int
+        - subject: string
+        - message: string
+    """
+    
+    def post(self, request):
+        # Get recipient
+        recipient_id = request.data.get('recipient_id')
+        if not recipient_id:
+            return Response({"error": "recipient_id is required"}, status=HTTP_400_BAD_REQUEST)
+
+        recipient = User.objects.filter(id=recipient_id).first()
+        if not recipient:
+            return Response({"error": "Recipient not found"}, status=HTTP_404_NOT_FOUND)
+
+        # Get email content
+        subject = request.data.get('subject', 'Message from Scoutbase')
+        message = request.data.get('message')
+        if not message:
+            return Response({"error": "message is required"}, status=HTTP_400_BAD_REQUEST)
+
+        try:
+            # Send email
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[recipient.email],
+                fail_silently=False,
+            )
+            return Response({
+                "message": "Email sent successfully",
+                "to": recipient.email
+            }, status=HTTP_200_OK)
+        except Exception as e:
+            return Response({
+                "error": "Failed to send email",
+                "details": str(e)
+            }, status=HTTP_400_BAD_REQUEST)
+
+class FetchUserEmailView(APIView):
+    """
+    Retrieves the email of a specified user.
+    
+    Endpoints:
+        GET /fetch-email/<user_id>/: Returns the user's email information
+    
+    Path Parameters:
+        - user_id: int
+    """
+    
+    def get(self, request, user_id):
+        # Fetch the user by ID
+        user = User.objects.filter(id=user_id).first()
+        if not user:
+            return Response({"error": "User not found"}, status=HTTP_404_NOT_FOUND)
+
+        return Response({"email": user.email}, status=HTTP_200_OK)
+

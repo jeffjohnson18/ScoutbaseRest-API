@@ -1,7 +1,7 @@
 ## Import the path function from the django.urls module
 ## Import the RegisterView, LoginView, UserView, and LogoutView classes from the views module
 from django.urls import path
-from .views import RegisterView, LoginView, UserView, LogoutView, AssignRoleView, FetchUserRoleView, CreateCoachView, CreateAthleteView, CreateScoutView, SearchAthleteView, SearchCoachView, EditAthleteView, EditCoachView, DeleteAccountView
+from .views import RegisterView, LoginView, UserView, LogoutView, AssignRoleView, FetchUserRoleView, CreateCoachView, CreateAthleteView, CreateScoutView, SearchAthleteView, SearchCoachView, EditAthleteView, EditCoachView, DeleteAccountView, SendEmailView, FetchUserEmailView
 
 # Define the URL patterns for the users app
 # The URL patterns all begin with http://localhost:8000/scoutbase/
@@ -22,4 +22,6 @@ urlpatterns = [
     path('editcoach/<int:pk>/', EditCoachView.as_view(), name='edit_coach'),
     path('editathlete/<int:pk>/', EditAthleteView.as_view(), name='edit_athlete'),
     path('delete-account/<int:pk>/', DeleteAccountView.as_view(), name='delete_account'),
+    path('send-email/', SendEmailView.as_view(), name='send_email'),
+    path('fetch-email/<int:user_id>/', FetchUserEmailView.as_view(), name='fetch_user_email'),
 ]
