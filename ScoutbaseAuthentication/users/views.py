@@ -497,3 +497,31 @@ class FetchUserEmailView(APIView):
 
         return Response({"email": user.email}, status=HTTP_200_OK)
 
+class FetchUserAttributesView(APIView):
+    """
+    Retrieves attributes of a specified user by user ID.
+    
+    Endpoints:
+        GET /fetch-user-attributes/<user_id>/: Returns the user's attributes
+    
+    Path Parameters:
+        - user_id: int
+    """
+    
+    def get(self, request, user_id):
+        # Fetch the user by ID
+        user = User.objects.filter(id=user_id).first()
+        if not user:
+            return Response({"error": "User not found"}, status=HTTP_404_NOT_FOUND)
+
+        # Prepare the user attributes to return
+        user_attributes = {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "role": user.role.name if user.role else None,  # Assuming role is a ForeignKey
+            # Add any other attributes you want to return
+        }
+
+        return Response(user_attributes, status=HTTP_200_OK)
+
