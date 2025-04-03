@@ -225,8 +225,7 @@ class CoachProfile(models.Model):
         bio (TextField): Coach's biography
         profile_picture (ImageField): Coach's photo
         state (CharField): State of school/institution
-    
-    Used to store coach-specific information and recruitment needs.
+        position_within_org (CharField): Position of the coach within the organization
     """
     user = models.OneToOneField(
         User,
@@ -260,6 +259,16 @@ class CoachProfile(models.Model):
         default="Unknown",
         help_text="State of school/institution"
     )
+    position_within_org = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Position of the coach within the organization"
+    )
+
+    def __str__(self):
+        """String representation of coach profile"""
+        return self.user.email
 
 class ScoutProfile(models.Model):
     """

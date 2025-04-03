@@ -210,7 +210,10 @@ class CreateCoachView(APIView):
     Request Body:
         - user_id: int
         - profile_picture: file (optional)
-        - [additional coach profile fields]
+        - team_needs: string (optional)
+        - school_name: string (optional)
+        - state: string (optional)
+        - position_within_org: string (optional)
     """
     def post(self, request):
         user_id = request.data.get('user_id')
@@ -343,6 +346,13 @@ class SearchCoachView(ListAPIView):
         
         # Apply non-null filters
         return queryset.filter(**{k: v for k, v in filters.items() if v is not None})
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+
+        # The user_id will now be included in the serialized data
+        return Response(serializer.data)
 
 class EditCoachView(APIView):
     """

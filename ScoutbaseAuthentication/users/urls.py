@@ -24,5 +24,5 @@ urlpatterns = [
     path('delete-account/<int:pk>/', DeleteAccountView.as_view(), name='delete_account'),
     path('send-email/', SendEmailView.as_view(), name='send_email'),
     path('fetch-email/<int:user_id>/', FetchUserEmailView.as_view(), name='fetch_user_email'),
-    path('fetch-user-attributes/<int:user_id>/', FetchUserAttributesView.as_view(), name='fetch_user_attributes'),
+    path('fetch-user-attributes/<int:user_id>/', FetchUserAttributesView.as_view(), name='fetch_user_attributes')
 ]

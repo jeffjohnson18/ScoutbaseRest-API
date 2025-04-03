@@ -113,10 +113,12 @@ class AthleteProfileSerializer(serializers.ModelSerializer):
         allow_null=True,
         allow_empty_file=True
     )
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
 
     class Meta:
         model = AthleteProfile
         fields = [
+            'id',
             'high_school_name',
             'positions',
             'youtube_video_link',
@@ -126,7 +128,8 @@ class AthleteProfileSerializer(serializers.ModelSerializer):
             'bio',
             'state',
             'batting_arm',
-            'throwing_arm'
+            'throwing_arm',
+            'user_id'
         ]
 
     def validate_youtube_video_link(self, value):
@@ -156,26 +159,25 @@ class CoachProfileSerializer(serializers.ModelSerializer):
         - bio: string
         - profile_picture: ImageField (optional)
         - state: string
-    
-    Features:
-        - Optional profile picture upload
-        - Team and school information
-        - Coach biography
     """
     profile_picture = serializers.ImageField(
         required=False,
         allow_null=True,
         allow_empty_file=True
     )
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
 
     class Meta:
         model = CoachProfile
         fields = [
+            'id',
             'team_needs',
             'school_name',
             'bio',
             'profile_picture',
-            'state'
+            'state',
+            'position_within_org',
+            'user_id'
         ]
 
 class ScoutProfileSerializer(serializers.ModelSerializer):
