@@ -440,53 +440,6 @@ class DeleteAccountView(APIView):
         response.delete_cookie('jwt')
         return response
 
-class SendEmailView(APIView):
-    """
-    Sends an email to a specified user.
-    
-    Endpoints:
-        POST /send-email/: Sends email to specified user
-    
-    Request Body:
-        - recipient_id: int
-        - subject: string
-        - message: string
-    """
-    
-    def post(self, request):
-        # Get recipient
-        recipient_id = request.data.get('recipient_id')
-        if not recipient_id:
-            return Response({"error": "recipient_id is required"}, status=HTTP_400_BAD_REQUEST)
-
-        recipient = User.objects.filter(id=recipient_id).first()
-        if not recipient:
-            return Response({"error": "Recipient not found"}, status=HTTP_404_NOT_FOUND)
-
-        # Get email content
-        subject = request.data.get('subject', 'Message from Scoutbase')
-        message = request.data.get('message')
-        if not message:
-            return Response({"error": "message is required"}, status=HTTP_400_BAD_REQUEST)
-
-        try:
-            # Send email
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[recipient.email],
-                fail_silently=False,
-            )
-            return Response({
-                "message": "Email sent successfully",
-                "to": recipient.email
-            }, status=HTTP_200_OK)
-        except Exception as e:
-            return Response({
-                "error": "Failed to send email",
-                "details": str(e)
-            }, status=HTTP_400_BAD_REQUEST)
 
 class FetchUserEmailView(APIView):
     """
