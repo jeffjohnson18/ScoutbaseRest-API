@@ -297,6 +297,7 @@ class SearchAthleteView(ListAPIView):
         - state: string (optional)
         - height: int (optional)
         - weight: int (optional)
+        - name: string (optional)
     """
     serializer_class = AthleteProfileSerializer
 
@@ -312,7 +313,9 @@ class SearchAthleteView(ListAPIView):
             'height': self.request.query_params.get('height'),
             'weight': self.request.query_params.get('weight'),
             'batting_arm': self.request.query_params.get('batting_arm'),
-            'throwing_arm': self.request.query_params.get('throwing_arm')
+            'throwing_arm': self.request.query_params.get('throwing_arm'),
+            'bio__icontains': self.request.query_params.get('bio'),
+            'user__name__icontains': self.request.query_params.get('name'),
         }
         
         # Apply non-null filters
@@ -339,9 +342,11 @@ class SearchCoachView(ListAPIView):
         # Apply filters based on query parameters
         filters = {
             'user_id': self.request.query_params.get('user_id'),
+            'user__name__icontains': self.request.query_params.get('name'),
             'team_needs__icontains': self.request.query_params.get('team_needs'),
             'school_name__icontains': self.request.query_params.get('school_name'),
-            'state__icontains': self.request.query_params.get('state')
+            'state__icontains': self.request.query_params.get('state'),
+            'position_within_org__icontains': self.request.query_params.get('position_within_org'),
         }
         
         # Apply non-null filters

@@ -162,6 +162,11 @@ class AthleteProfile(models.Model):
         related_name='athlete_profile',
         help_text="User account associated with this profile"
     )
+    name = models.CharField(
+        max_length=255,
+        default="Unknown",
+        help_text="Name of athlete"
+    )
     high_school_name = models.CharField(
         max_length=255,
         default="Unknown",
@@ -232,6 +237,11 @@ class CoachProfile(models.Model):
         on_delete=models.CASCADE,
         related_name='coach_profile',
         help_text="User account associated with this profile"
+    )
+    name = models.CharField(
+        max_length=255,
+        default="Unknown",
+        help_text="Name of athlete"
     )
     team_needs = models.CharField(
         max_length=255,

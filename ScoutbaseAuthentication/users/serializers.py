@@ -119,6 +119,7 @@ class AthleteProfileSerializer(serializers.ModelSerializer):
         model = AthleteProfile
         fields = [
             'id',
+            'name',
             'high_school_name',
             'positions',
             'youtube_video_link',
@@ -171,6 +172,7 @@ class CoachProfileSerializer(serializers.ModelSerializer):
         model = CoachProfile
         fields = [
             'id',
+            'name',
             'team_needs',
             'school_name',
             'bio',
