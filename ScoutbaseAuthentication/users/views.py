@@ -342,11 +342,12 @@ class SearchCoachView(ListAPIView):
         # Apply filters based on query parameters
         filters = {
             'user_id': self.request.query_params.get('user_id'),
-            'user__name__icontains': self.request.query_params.get('name'),
+            'name__icontains': self.request.query_params.get('name'),
             'team_needs__icontains': self.request.query_params.get('team_needs'),
             'school_name__icontains': self.request.query_params.get('school_name'),
             'state__icontains': self.request.query_params.get('state'),
             'position_within_org__icontains': self.request.query_params.get('position_within_org'),
+            'bio__icontains': self.request.query_params.get('bio'),
         }
         
         # Apply non-null filters
