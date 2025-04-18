@@ -19,7 +19,7 @@ import logging
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
-from rest_framework.exceptions import AuthenticationFailed, ValidationError
+from rest_framework.exceptions import AuthenticationFailed, ValidationError, NotFound
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
@@ -348,6 +348,7 @@ class SearchCoachView(ListAPIView):
             'state__icontains': self.request.query_params.get('state'),
             'position_within_org__icontains': self.request.query_params.get('position_within_org'),
             'bio__icontains': self.request.query_params.get('bio'),
+            'division__icontains': self.request.query_params.get('division'),
         }
         
         # Apply non-null filters
@@ -493,4 +494,52 @@ class FetchUserAttributesView(APIView):
         }
 
         return Response(user_attributes, status=HTTP_200_OK)
+
+class EditCoachProfilePictureView(APIView):
+    """
+    Updates the profile picture of a coach.
+    
+    Endpoints:
+        PUT /edit-coach-profile-picture/<int:user_id>/: Updates the profile picture for the specified coach
+    
+    Path Parameters:
+        - user_id: int
+    """
+    def put(self, request, user_id):
+        try:
+            coach_profile = CoachProfile.objects.get(user_id=user_id)
+        except CoachProfile.DoesNotExist:
+            raise NotFound("Coach profile not found")
+
+        # Update the profile picture
+        if 'profile_picture' in request.FILES:
+            coach_profile.profile_picture = request.FILES['profile_picture']
+            coach_profile.save()
+            return Response({"message": "Profile picture updated successfully"}, status=200)
+
+        return Response({"error": "No profile picture provided"}, status=400)
+
+class EditAthleteProfilePictureView(APIView):
+    """
+    Updates the profile picture of an athlete.
+    
+    Endpoints:
+        PUT /edit-athlete-profile-picture/<int:user_id>/: Updates the profile picture for the specified athlete
+    
+    Path Parameters:
+        - user_id: int
+    """
+    def put(self, request, user_id):
+        try:
+            athlete_profile = AthleteProfile.objects.get(user_id=user_id)
+        except AthleteProfile.DoesNotExist:
+            raise NotFound("Athlete profile not found")
+
+        # Update the profile picture
+        if 'profile_picture' in request.FILES:
+            athlete_profile.profile_picture = request.FILES['profile_picture']
+            athlete_profile.save()
+            return Response({"message": "Profile picture updated successfully"}, status=200)
+
+        return Response({"error": "No profile picture provided"}, status=400)
 

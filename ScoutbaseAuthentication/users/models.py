@@ -275,6 +275,12 @@ class CoachProfile(models.Model):
         null=True,
         help_text="Position of the coach within the organization"
     )
+    division = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Division level of the team"
+    )
 
     def __str__(self):
         """String representation of coach profile"""

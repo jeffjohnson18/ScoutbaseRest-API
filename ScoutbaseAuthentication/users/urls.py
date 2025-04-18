@@ -1,7 +1,7 @@
 ## Import the path function from the django.urls module
 ## Import the RegisterView, LoginView, UserView, and LogoutView classes from the views module
 from django.urls import path
-from .views import RegisterView, LoginView, UserView, LogoutView, AssignRoleView, FetchUserRoleView, CreateCoachView, CreateAthleteView, CreateScoutView, SearchAthleteView, SearchCoachView, EditAthleteView, EditCoachView, DeleteAccountView, FetchUserEmailView, FetchUserAttributesView
+from .views import RegisterView, LoginView, UserView, LogoutView, AssignRoleView, FetchUserRoleView, CreateCoachView, CreateAthleteView, CreateScoutView, SearchAthleteView, SearchCoachView, EditAthleteView, EditCoachView, DeleteAccountView, FetchUserEmailView, FetchUserAttributesView, EditAthleteProfilePictureView, EditCoachProfilePictureView
 
 # Define the URL patterns for the users app
 # The URL patterns all begin with http://localhost:8000/scoutbase/
@@ -23,5 +23,7 @@ urlpatterns = [
     path('editathlete/<int:pk>/', EditAthleteView.as_view(), name='edit_athlete'),
     path('delete-account/<int:pk>/', DeleteAccountView.as_view(), name='delete_account'),
     path('fetch-email/<int:user_id>/', FetchUserEmailView.as_view(), name='fetch_user_email'),
-    path('fetch-user-attributes/<int:user_id>/', FetchUserAttributesView.as_view(), name='fetch_user_attributes')
+    path('fetch-user-attributes/<int:user_id>/', FetchUserAttributesView.as_view(), name='fetch_user_attributes'),
+    path('edit-coach-profile-picture/<int:user_id>/', EditCoachProfilePictureView.as_view(), name='edit_coach_profile_picture'),
+    path('edit-athlete-profile-picture/<int:user_id>/', EditAthleteProfilePictureView.as_view(), name='edit_athlete_profile_picture'),
 ]

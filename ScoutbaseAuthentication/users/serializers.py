@@ -179,7 +179,8 @@ class CoachProfileSerializer(serializers.ModelSerializer):
             'profile_picture',
             'state',
             'position_within_org',
-            'user_id'
+            'division',
+            'user_id',
         ]
 
 class ScoutProfileSerializer(serializers.ModelSerializer):
