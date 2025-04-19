@@ -210,14 +210,13 @@ class AthleteProfile(models.Model):
     throwing_arm = models.CharField(
         max_length=255,
         default="Unknown",
-        help_text="State of residence/school"
+        help_text="Throwing arm of the athlete"
     )
     batting_arm = models.CharField(
         max_length=255,
         default="Unknown",
-        help_text="State of residence/school"
+        help_text="Batting arm of the athlete"
     )
-
 
 class CoachProfile(models.Model):
     """
@@ -231,6 +230,7 @@ class CoachProfile(models.Model):
         profile_picture (ImageField): Coach's photo
         state (CharField): State of school/institution
         position_within_org (CharField): Position of the coach within the organization
+        division (CharField): Division level of the team
     """
     user = models.OneToOneField(
         User,
@@ -241,7 +241,7 @@ class CoachProfile(models.Model):
     name = models.CharField(
         max_length=255,
         default="Unknown",
-        help_text="Name of athlete"
+        help_text="Name of coach"
     )
     team_needs = models.CharField(
         max_length=255,

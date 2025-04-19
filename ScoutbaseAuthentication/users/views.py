@@ -2,12 +2,6 @@
 # Authentication and Profile Management Views
 # This module handles user authentication, registration, profile management,
 # and search functionality for the Scoutbase platform.
-# 
-# Features:
-# - User authentication with JWT
-# - Profile management for Athletes, Coaches, and Scouts
-# - Role-based access control
-# - Profile search functionality
 ################################################################################
 
 # Standard library imports
@@ -56,6 +50,7 @@ class RegisterView(APIView):
         - [additional fields based on UserSerializer]
     """
     def post(self, request):
+        # Validate and save the user data
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -77,6 +72,7 @@ class LoginView(APIView):
         - Token expires in 60 minutes
     """
     def post(self, request):
+        # Extract email and password from the request
         email = request.data['email']
         password = request.data['password']
 
@@ -112,15 +108,18 @@ class UserView(APIView):
         - Requires valid JWT token in cookies
     """
     def get(self, request):
+        # Retrieve the JWT token from cookies
         token = request.COOKIES.get('jwt')
         if not token:
             raise AuthenticationFailed('Unauthenticated')
         
         try: 
+            # Decode the token to get user information
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Unauthenticated')
         
+        # Fetch the user based on the decoded token
         user = User.objects.filter(id=payload['id']).first()
         serializer = UserSerializer(user)
         return Response(token)
@@ -133,6 +132,7 @@ class LogoutView(APIView):
         POST /logout/: Removes JWT token cookie
     """
     def post(self, request):
+        # Create a response and delete the JWT cookie
         response = Response()
         response.delete_cookie('jwt')
         response.data = {'message': 'success'}
@@ -150,6 +150,7 @@ class AssignRoleView(APIView):
         - role_name: string
     """
     def post(self, request):
+        # Extract user ID and role name from the request
         user_id = request.data.get('user_id')
         role_name = request.data.get('role_name')
 
@@ -182,6 +183,7 @@ class FetchUserRoleView(APIView):
         - user_id: int
     """
     def get(self, request):
+        # Extract user ID from query parameters
         user_id = request.query_params.get('user_id')
         if not user_id:
             return Response({"error": "user_id is required"}, status=400)
@@ -191,6 +193,7 @@ class FetchUserRoleView(APIView):
         except ValueError:
             return Response({"error": "user_id must be a number"}, status=400)
 
+        # Fetch the user and their role
         user = User.objects.filter(id=user_id).first()
         if not user:
             return Response({"error": "User not found"}, status=404)
@@ -216,6 +219,7 @@ class CreateCoachView(APIView):
         - position_within_org: string (optional)
     """
     def post(self, request):
+        # Extract user ID from the request
         user_id = request.data.get('user_id')
         user = User.objects.filter(id=user_id).first()
         
@@ -224,6 +228,7 @@ class CreateCoachView(APIView):
         if hasattr(user, 'coach_profile'):
             raise ValidationError("Coach profile already exists for this user.")
 
+        # Validate and save the coach profile data
         serializer = CoachProfileSerializer(data=request.data)
         if serializer.is_valid():
             coach_profile = serializer.save(user=user)
@@ -243,6 +248,7 @@ class CreateAthleteView(APIView):
         - [additional athlete profile fields]
     """
     def post(self, request):
+        # Extract user ID from the request
         user_id = request.data.get('user_id')
         user = User.objects.filter(id=user_id).first()
         
@@ -251,6 +257,7 @@ class CreateAthleteView(APIView):
         if hasattr(user, 'athlete_profile'):
             raise ValidationError("Athlete profile already exists for this user.")
 
+        # Validate and save the athlete profile data
         serializer = AthleteProfileSerializer(data=request.data)
         if serializer.is_valid():
             athlete_profile = serializer.save(user=user)
@@ -269,6 +276,7 @@ class CreateScoutView(APIView):
         - [additional scout profile fields]
     """
     def post(self, request):
+        # Extract user ID from the request
         user_id = request.data.get('user_id')
         user = User.objects.filter(id=user_id).first()
         
@@ -277,6 +285,7 @@ class CreateScoutView(APIView):
         if hasattr(user, 'scout_profile'):
             raise ValidationError("Scout profile already exists for this user.")
 
+        # Validate and save the scout profile data
         serializer = ScoutProfileSerializer(data=request.data)
         if serializer.is_valid():
             scout_profile = serializer.save(user=user)
@@ -302,6 +311,7 @@ class SearchAthleteView(ListAPIView):
     serializer_class = AthleteProfileSerializer
 
     def get_queryset(self):
+        # Retrieve all athlete profiles
         queryset = AthleteProfile.objects.all()
         
         # Apply filters based on query parameters
@@ -337,6 +347,7 @@ class SearchCoachView(ListAPIView):
     serializer_class = CoachProfileSerializer
 
     def get_queryset(self):
+        # Retrieve all coach profiles
         queryset = CoachProfile.objects.all()
         
         # Apply filters based on query parameters
@@ -355,10 +366,10 @@ class SearchCoachView(ListAPIView):
         return queryset.filter(**{k: v for k, v in filters.items() if v is not None})
 
     def list(self, request, *args, **kwargs):
+        # Retrieve and serialize the filtered coach profiles
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
 
-        # The user_id will now be included in the serialized data
         return Response(serializer.data)
 
 class EditCoachView(APIView):
@@ -373,10 +384,12 @@ class EditCoachView(APIView):
     """
     def put(self, request, pk):
         try:
+            # Fetch the coach profile by user ID
             coach_profile = CoachProfile.objects.get(user_id=pk)
         except CoachProfile.DoesNotExist:
             return Response({"error": "Coach profile not found"}, status=HTTP_404_NOT_FOUND)
 
+        # Validate and update the coach profile data
         serializer = CoachProfileSerializer(coach_profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -395,10 +408,12 @@ class EditAthleteView(APIView):
     """
     def put(self, request, pk):
         try:
+            # Fetch the athlete profile by user ID
             athlete_profile = AthleteProfile.objects.get(user_id=pk)
         except AthleteProfile.DoesNotExist:
             return Response({"error": "Athlete profile not found"}, status=HTTP_404_NOT_FOUND)
 
+        # Validate and update the athlete profile data
         serializer = AthleteProfileSerializer(athlete_profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -428,6 +443,7 @@ class DeleteAccountView(APIView):
             raise AuthenticationFailed('Unauthenticated')
 
         try:
+            # Decode the JWT token to get user information
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Unauthenticated')
@@ -446,7 +462,6 @@ class DeleteAccountView(APIView):
         response = Response({"message": "Account deleted successfully"}, status=HTTP_200_OK)
         response.delete_cookie('jwt')
         return response
-
 
 class FetchUserEmailView(APIView):
     """
@@ -490,7 +505,6 @@ class FetchUserAttributesView(APIView):
             "name": user.name,
             "email": user.email,
             "role": user.role.name if user.role else None,  # Assuming role is a ForeignKey
-            # Add any other attributes you want to return
         }
 
         return Response(user_attributes, status=HTTP_200_OK)
@@ -507,6 +521,7 @@ class EditCoachProfilePictureView(APIView):
     """
     def put(self, request, user_id):
         try:
+            # Fetch the coach profile by user ID
             coach_profile = CoachProfile.objects.get(user_id=user_id)
         except CoachProfile.DoesNotExist:
             raise NotFound("Coach profile not found")
@@ -531,6 +546,7 @@ class EditAthleteProfilePictureView(APIView):
     """
     def put(self, request, user_id):
         try:
+            # Fetch the athlete profile by user ID
             athlete_profile = AthleteProfile.objects.get(user_id=user_id)
         except AthleteProfile.DoesNotExist:
             raise NotFound("Athlete profile not found")

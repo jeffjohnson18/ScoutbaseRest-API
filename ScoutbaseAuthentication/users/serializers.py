@@ -160,6 +160,7 @@ class CoachProfileSerializer(serializers.ModelSerializer):
         - bio: string
         - profile_picture: ImageField (optional)
         - state: string
+        - division: string
     """
     profile_picture = serializers.ImageField(
         required=False,
