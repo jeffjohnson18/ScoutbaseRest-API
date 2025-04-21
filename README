@@ -1,0 +1,242 @@
+# Scoutbase REST API
+
+A Django REST Framework–powered backend for Scoutbase, enabling user authentication, role-based access, profile management for coaches, athletes, and scouts, search functionality, and email communication between users.
+
+---
+
+## Table of Contents
+
+1. [Project Overview](#project-overview)  
+2. [Features](#features)  
+3. [Tech Stack](#tech-stack)  
+4. [Getting Started](#getting-started)  
+   - [Prerequisites](#prerequisites)  
+   - [Installation](#installation)  
+   - [Environment Variables](#environment-variables)  
+   - [Database Migrations](#database-migrations)  
+   - [Running the Server](#running-the-server)  
+5. [API Endpoints](#api-endpoints)  
+   - [Authentication](#authentication)  
+   - [User Management](#user-management)  
+   - [Profile Management](#profile-management)  
+   - [Search](#search)  
+   - [Email](#email)  
+6. [Running Tests](#running-tests)  
+7. [Directory Structure](#directory-structure)  
+8. [Contributing](#contributing)  
+9. [License](#license)
+
+---
+
+## Project Overview
+
+Scoutbase is a platform connecting athletes, coaches, and scouts. This backend provides:
+
+- JWT-based authentication  
+- Role assignment and retrieval  
+- Creation/editing of Athlete, Coach, and Scout profiles  
+- Search endpoints for athletes and coaches  
+- Email sending functionality  
+- Profile picture upload and management
+
+---
+
+## Features
+
+- **User Registration & Login** (JWT)  
+- **Role Management** (assign, fetch)  
+- **Profile CRUD** for Athletes, Coaches, Scouts  
+- **Search** by various criteria (name, school, division, stats)  
+- **Email** users directly via API  
+- **Profile Pictures** upload and update  
+- **Secure** endpoints with proper validation & error handling  
+
+---
+
+## Tech Stack
+
+- Python 3.x  
+- Django 4.x  
+- Django REST Framework  
+- PyJWT for JWT token handling  
+- MySQL
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Python ≥ 3.8  
+- pip  
+- (Optional) virtualenv  
+
+### Installation
+
+```bash
+git clone https://github.com/your-org/ScoutbaseRest-API.git
+cd ScoutbaseRest-API
+
+# (Optional) create & activate virtualenv
+python3 -m venv .venv
+source .venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+### Environment Variables
+
+Create a `.env` (or set in your shell) with at least:
+
+```ini
+DJANGO_SECRET_KEY=your_django_secret_key
+DEFAULT_FROM_EMAIL=no‑reply@scoutbase.com
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=your_smtp_user
+EMAIL_HOST_PASSWORD=your_smtp_password
+EMAIL_USE_TLS=True
+```
+
+Adjust your `settings.py` to load these variables (e.g. via `django-environ` or `python-dotenv`).
+
+### Database Migrations
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+### Running the Server
+
+```bash
+python manage.py runserver
+```
+
+---
+
+## API Endpoints
+
+All endpoints are prefixed with `/scoutbase/`. Unless noted, requests/​responses use JSON.
+
+### Authentication
+
+- **POST** `/scoutbase/register`  
+  Create a new user.  
+  Body: `{ "email": "", "password": "", "name": "" }`
+
+- **POST** `/scoutbase/login`  
+  Login and receive a JWT cookie & payload.  
+  Body: `{ "email": "", "password": "" }`
+
+- **POST** `/scoutbase/logout`  
+  Clears the JWT cookie.
+
+### User Management
+
+- **GET** `/scoutbase/user`  
+  Fetch the authenticated user’s info via JWT.
+
+- **GET** `/scoutbase/fetch-user-attributes/<user_id>/`  
+  Returns `{ id, name, email, role }`.
+
+- **GET** `/scoutbase/fetch-email/<user_id>/`  
+  Returns `{ "email": "user@example.com" }`.
+
+- **POST** `/scoutbase/assignrole`  
+  Assign a role to a user.  
+  Body: `{ "user_id": 1, "role_name": "Coach" }`
+
+- **GET** `/scoutbase/fetchrole?user_id=<id>`  
+  Returns `{ "role": "Coach" }`.
+
+### Profile Management
+
+#### Coach Profile
+
+- **POST** `/scoutbase/coach/createprofile`  
+  Body:  
+  ```
+  {
+    "user_id": 1,
+    "team_needs": "...",
+    "school_name": "...",
+    "state": "...",
+    "position_within_org": "...",
+    "division": "...",
+    "bio": "...",
+    "profile_picture": <FILE>
+  }
+  ```
+
+- **PUT** `/scoutbase/edit-coach/<user_id>/`  
+  Partial update of coach profile fields.
+
+- **PUT** `/scoutbase/edit-coach-profile-picture/<user_id>/`  
+  Update coach’s profile picture.  
+  Form‑data key: `profile_picture`.
+
+#### Athlete Profile
+
+- **POST** `/scoutbase/athlete/createprofile`  
+  Body:  
+  ```
+  {
+    "user_id": 2,
+    "high_school_name": "...",
+    "positions": "...",
+    "state": "...",
+    "height": 6.0,
+    "weight": 180,
+    "bio": "...",
+    "youtube_video_link": "...",
+    "profile_picture": <FILE>
+  }
+  ```
+
+- **PUT** `/scoutbase/edit-athlete/<user_id>/`  
+  Partial update of athlete profile.
+
+- **PUT** `/scoutbase/edit-athlete-profile-picture/<user_id>/`  
+  Update athlete’s profile picture.  
+  Form‑data key: `profile_picture`.
+
+#### Scout Profile
+
+- **POST** `/scoutbase/scout/createprofile`  
+  Body: `{ "user_id": 3, /* additional fields */ }`
+
+---
+
+### Search
+
+- **GET** `/scoutbase/searchforathlete/?name=<name>&high_school_name=<...>&positions=<...>&state=<...>`  
+  Filters athletes by provided query params.
+
+- **GET** `/scoutbase/searchforcoach/?name=<name>&school_name=<...>&state=<...>&division=<...>`  
+  Filters coaches by provided query params.
+
+---
+
+### Email
+
+- **POST** `/scoutbase/send-email`  
+  Send an email to a registered user.  
+  Body: `{ "recipient_id": 10, "subject": "...", "message": "..." }`
+
+---
+
+## Running Tests
+
+```bash
+python manage.py test
+```
+
+For quicker iterations, use:
+```bash
+python manage.py test --keepdb
+```
+
+---
+
+## Directory Structure
