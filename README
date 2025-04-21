@@ -20,11 +20,7 @@ A Django REST Framework–powered backend for Scoutbase, enabling user authentic
    - [User Management](#user-management)  
    - [Profile Management](#profile-management)  
    - [Search](#search)  
-   - [Email](#email)  
-6. [Running Tests](#running-tests)  
-7. [Directory Structure](#directory-structure)  
-8. [Contributing](#contributing)  
-9. [License](#license)
+
 
 ---
 
@@ -217,26 +213,3 @@ All endpoints are prefixed with `/scoutbase/`. Unless noted, requests/​respons
   Filters coaches by provided query params.
 
 ---
-
-### Email
-
-- **POST** `/scoutbase/send-email`  
-  Send an email to a registered user.  
-  Body: `{ "recipient_id": 10, "subject": "...", "message": "..." }`
-
----
-
-## Running Tests
-
-```bash
-python manage.py test
-```
-
-For quicker iterations, use:
-```bash
-python manage.py test --keepdb
-```
-
----
-
-## Directory Structure
